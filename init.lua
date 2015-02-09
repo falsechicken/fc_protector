@@ -628,4 +628,19 @@ minetest.register_craft({
 minetest.register_craftitem("fc_protector:key", {
 	description = "Blank Key",
 	inventory_image = "key.png",
+	stack_max = 1,
+	on_use = function(keyStack, player)
+				printKeyData(keyStack, player)
+			 end,
 	})
+	
+function printKeyData(keyStack, player) -- Temp workaround until description can be dynamically set.
+	
+	local keyMetadata = keyStack:get_metadata()
+	
+	if keyMetadata == "" then
+		minetest.chat_send_player(player:get_player_name(), "Key Data Empty.")
+	else
+		minetest.chat_send_player(player:get_player_name(), "Key Data: " .. keyMetadata)
+	end
+end
