@@ -623,3 +623,9 @@ minetest.register_craft({
 		{'group:wood', 'group:wood', 'group:wood'},
 	}
 })
+
+-- Register door/chest key.
+minetest.register_craftitem("fc_protector:key", {
+	description = "Blank Key",
+	inventory_image = "key.png",
+	})
