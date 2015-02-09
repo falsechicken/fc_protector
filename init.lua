@@ -438,9 +438,26 @@ doors.register_door(name, {
 })
 
 minetest.override_item(name.."_b_1", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
-			on_rightclick(pos, 1, name.."_t_1", name.."_b_2", name.."_t_2", {1,2,3,0})
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if minetest.get_meta(pos):get_string("key") == "" then -- Door has no key setup
+			print("Door has no key") -- DEBUG
+			if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key and the door has no assigned key.
+				print("Attempting to lock door...") -- DEBUG
+				setKey(keyItem, pos) -- Lock the door with the current key.
+			else
+				on_rightclick(pos, 1, name.."_t_1", name.."_b_2", name.."_t_2", {1,2,3,0}) -- Open otherwise.
+			end
+		else -- Door has key setup
+			if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key check it.
+			
+				if keyItem:get_metadata() == minetest.get_meta(pos):get_string("key") then -- If key matches.
+					on_rightclick(pos, 1, name.."_t_1", name.."_b_2", name.."_t_2", {1,2,3,0})
+				else
+					minetest.chat_send_player(clicker:get_player_name(), "Wrong Key.")
+				end
+			else -- If not tell the player the door is locked.
+				minetest.chat_send_player(clicker:get_player_name(), "Door Is Locked.")
+			end
 		end
 	end,
 })
@@ -643,4 +660,23 @@ function printKeyData(keyStack, player) -- Temp workaround until description can
 	else
 		minetest.chat_send_player(player:get_player_name(), "Key Data: " .. keyMetadata)
 	end
+end
+
+function setKey(keyStack, nodeToLock) -- Called when a door/chest has no key assigned. 
+
+	if keyStack:get_metadata() == "" then -- Key is new and has not had a code generated yet.
+		keyStack:set_metadata(generateKeyData())
+	end
+
+	minetest.get_meta(nodeToLock):set_string("key", keyStack:get_metadata())
+	
+	print("Key Set!") -- DEBUG
+
+end
+
+function generateKeyData() -- Generates a random passcode for key metadata. Called when new keys are used for the first time.
+	local keyCode = math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. 
+							math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9)
+	
+	return keyCode
 end
