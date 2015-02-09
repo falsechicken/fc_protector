@@ -1,20 +1,20 @@
 minetest.register_privilege("delprotect","Ignore other players protection")
 
-protector = {}
-protector.radius = 5
+fc_protector = {}
+fc_protector.radius = 5
 
-protector.get_member_list = function(meta)
+fc_protector.get_member_list = function(meta)
 	local s = meta:get_string("members")
 	local list = s:split(" ")
 	return list
 end
 
-protector.set_member_list = function(meta, list)
+fc_protector.set_member_list = function(meta, list)
 	meta:set_string("members", table.concat(list, " "))
 end
 
-protector.is_member = function (meta, name)
-	local list = protector.get_member_list(meta)
+fc_protector.is_member = function (meta, name)
+	local list = fc_protector.get_member_list(meta)
 	for _, n in ipairs(list) do
 		if n == name then
 			return true
@@ -23,33 +23,33 @@ protector.is_member = function (meta, name)
 	return false
 end
 
-protector.add_member = function(meta, name)
-	if protector.is_member(meta, name) then return end
-	local list = protector.get_member_list(meta)
+fc_protector.add_member = function(meta, name)
+	if fc_protector.is_member(meta, name) then return end
+	local list = fc_protector.get_member_list(meta)
 	table.insert(list,name)
-	protector.set_member_list(meta,list)
+	fc_protector.set_member_list(meta,list)
 end
 
-protector.del_member = function(meta,name)
-	local list = protector.get_member_list(meta)
+fc_protector.del_member = function(meta,name)
+	local list = fc_protector.get_member_list(meta)
 	for i, n in ipairs(list) do
 		if n == name then
 			table.remove(list, i)
 			break
 		end
 	end
-	protector.set_member_list(meta,list)
+	fc_protector.set_member_list(meta,list)
 end
 
--- Protector Interface
+-- fc_protector Interface
 
-protector.generate_formspec = function(meta)
+fc_protector.generate_formspec = function(meta)
 	if meta:get_int("page") == nil then meta:set_int("page",0) end
 	local formspec = "size[8,7]"
-		.."label[0,0;-- Protector interface --]"
+		.."label[0,0;-- fc_protector interface --]"
 		.."label[0,1;Punch node to show protected area]"
 		.."label[0,2;Members: (type nick, press Enter to add)]"
-	local members = protector.get_member_list(meta)
+	local members = fc_protector.get_member_list(meta)
 	
 	local npp = 12 -- was 15, names per page
 	local s = 0
@@ -58,9 +58,9 @@ protector.generate_formspec = function(meta)
 		if s < meta:get_int("page")*15 then s = s +1 else
 			if i < npp then
 				formspec = formspec .. "button["..(i%4*2)..","
-				..math.floor(i/4+3)..";1.5,.5;protector_member;"..member.."]"
+				..math.floor(i/4+3)..";1.5,.5;fc_protector_member;"..member.."]"
 				formspec = formspec .. "button["..(i%4*2+1.25)..","
-				..math.floor(i/4+3)..";.75,.5;protector_del_member_"..member..";X]"
+				..math.floor(i/4+3)..";.75,.5;fc_protector_del_member_"..member..";X]"
 			end
 			i = i +1
 		end
@@ -68,7 +68,7 @@ protector.generate_formspec = function(meta)
 	local add_i = i
 	if add_i < npp then
 		formspec = formspec
-		.."field["..(add_i%4*2+1/3)..","..(math.floor(add_i/4+3)+1/3)..";1.433,.5;protector_add_member;;]"
+		.."field["..(add_i%4*2+1/3)..","..(math.floor(add_i/4+3)+1/3)..";1.433,.5;fc_protector_add_member;;]"
 	end
 	               		formspec = formspec.."button_exit[1,6.2;2,0.5;close_me;<< Back]"
 	return formspec
@@ -80,9 +80,9 @@ end
 -- 0 for no info
 -- 1 for "This area is owned by <owner> !" if you can't dig
 -- 2 for "This area is owned by <owner>.
--- 3 for checking protector overlaps
+-- 3 for checking fc_protector overlaps
 
-protector.can_dig = function(r,pos,digger,onlyowner,infolevel)
+fc_protector.can_dig = function(r,pos,digger,onlyowner,infolevel)
 
 	if not digger then
 		return false
@@ -98,19 +98,19 @@ protector.can_dig = function(r,pos,digger,onlyowner,infolevel)
 
 	if infolevel == 3 then infolevel = 1 end
 
-	-- Find the protector nodes
+	-- Find the fc_protector nodes
 
 	local positions = minetest.find_nodes_in_area(
 		{x=pos.x-r, y=pos.y-r, z=pos.z-r},
 		{x=pos.x+r, y=pos.y+r, z=pos.z+r},
-		{"protector:protect", "protector:protect2"})
+		{"fc_protector:protect", "fc_protector:protect2"})
 
 	for _, pos in ipairs(positions) do
 		local meta = minetest.env:get_meta(pos)
 		local owner = meta:get_string("owner")
 
 		if owner ~= whois then 
-			if onlyowner or not protector.is_member(meta, whois) then
+			if onlyowner or not fc_protector.is_member(meta, whois) then
 				if infolevel == 1 then
 					minetest.chat_send_player(whois, "This area is owned by "..owner.." !")
 				elseif infolevel == 2 then
@@ -141,40 +141,40 @@ end
 
 -- Can node be added or removed, if so return node else true (for protected)
 
-protector.old_is_protected = minetest.is_protected
+fc_protector.old_is_protected = minetest.is_protected
 minetest.is_protected = function(pos, digger)
 
-	if protector.can_dig(protector.radius, pos, digger, false, 1) then
-		return protector.old_is_protected(pos, digger)
+	if fc_protector.can_dig(fc_protector.radius, pos, digger, false, 1) then
+		return fc_protector.old_is_protected(pos, digger)
 	else
 		return true
 	end
 end
 
--- Make sure protection block doesn't overlap another protector's area
+-- Make sure protection block doesn't overlap another fc_protector's area
 
-protector.old_node_place = minetest.item_place
+fc_protector.old_node_place = minetest.item_place
 function minetest.item_place(itemstack, placer, pointed_thing)
 
-	if itemstack:get_name() == "protector:protect" or itemstack:get_name() == "protector:protect2" then
+	if itemstack:get_name() == "fc_protector:protect" or itemstack:get_name() == "fc_protector:protect2" then
 		local pos = pointed_thing.above
 		local user = placer:get_player_name()
-		if not protector.can_dig(protector.radius * 2, pos, user, true, 3) then
+		if not fc_protector.can_dig(fc_protector.radius * 2, pos, user, true, 3) then
 			minetest.chat_send_player(placer:get_player_name(),"Overlaps into another protected area")
-			return protector.old_node_place(itemstack, placer, pos)
+			return fc_protector.old_node_place(itemstack, placer, pos)
 		end
 	end
 
-	return protector.old_node_place(itemstack, placer, pointed_thing)
+	return fc_protector.old_node_place(itemstack, placer, pointed_thing)
 end
 
 -- END
 
 --= Protection Block
 
-minetest.register_node("protector:protect", {
+minetest.register_node("fc_protector:protect", {
 	description = "Protection Block",
-	tiles = {"protector_top.png","protector_top.png","protector_side.png"},
+	tiles = {"fc_protector_top.png","fc_protector_top.png","fc_protector_side.png"},
 	sounds = default.node_sound_stone_defaults(),
 	groups = {dig_immediate=2},
 	drawtype = "nodebox",
@@ -199,31 +199,31 @@ minetest.register_node("protector:protect", {
 			return
 		end
 
-		protector.can_dig(5,pointed_thing.under,user:get_player_name(),false,2)
+		fc_protector.can_dig(5,pointed_thing.under,user:get_player_name(),false,2)
 	end,
 
 	on_rightclick = function(pos, node, clicker, itemstack)
 		local meta = minetest.env:get_meta(pos)
-		if protector.can_dig(1,pos,clicker:get_player_name(),true,1) then
+		if fc_protector.can_dig(1,pos,clicker:get_player_name(),true,1) then
 			minetest.show_formspec(clicker:get_player_name(), 
-			"protector_"..minetest.pos_to_string(pos), protector.generate_formspec(meta)
+			"fc_protector_"..minetest.pos_to_string(pos), fc_protector.generate_formspec(meta)
 			)
 		end
 	end,
 
 	on_punch = function(pos, node, puncher)
-		if not protector.can_dig(1,pos,puncher:get_player_name(),true,1) then
+		if not fc_protector.can_dig(1,pos,puncher:get_player_name(),true,1) then
 			return
 		end
 
-		minetest.env:add_entity(pos, "protector:display")
+		minetest.env:add_entity(pos, "fc_protector:display")
 		minetest.env:get_node_timer(pos):start(10)
 	end,
 
 	on_timer = function(pos)
 		local objs = minetest.env:get_objects_inside_radius(pos,.5)
 		for _, o in pairs(objs) do
-			if (not o:is_player()) and o:get_luaentity().name == "protector:display" then
+			if (not o:is_player()) and o:get_luaentity().name == "fc_protector:display" then
 				o:remove()
 			end
 		end
@@ -231,7 +231,7 @@ minetest.register_node("protector:protect", {
 })
 
 minetest.register_craft({
-	output = "protector:protect 4",
+	output = "fc_protector:protect 4",
 	recipe = {
 		{"default:stone","default:stone","default:stone"},
 		{"default:stone","default:steel_ingot","default:stone"},
@@ -241,11 +241,11 @@ minetest.register_craft({
 
 --= Protection Logo
 
-minetest.register_node("protector:protect2", {
+minetest.register_node("fc_protector:protect2", {
 	description = "Protection Logo",
-	tiles = {"protector_logo.png"},
-	wield_image = "protector_logo.png",
-	inventory_image = "protector_logo.png",
+	tiles = {"fc_protector_logo.png"},
+	wield_image = "fc_protector_logo.png",
+	inventory_image = "fc_protector_logo.png",
 	sounds = default.node_sound_stone_defaults(),
 	groups = {dig_immediate=2},
 	paramtype = 'light',
@@ -275,31 +275,31 @@ minetest.register_node("protector:protect2", {
 			return
 		end
 
-		protector.can_dig(5,pointed_thing.under,user:get_player_name(),false,2)
+		fc_protector.can_dig(5,pointed_thing.under,user:get_player_name(),false,2)
 	end,
 
 	on_rightclick = function(pos, node, clicker, itemstack)
 		local meta = minetest.env:get_meta(pos)
-		if protector.can_dig(1,pos,clicker:get_player_name(),true,1) then
+		if fc_protector.can_dig(1,pos,clicker:get_player_name(),true,1) then
 			minetest.show_formspec(clicker:get_player_name(), 
-			"protector_"..minetest.pos_to_string(pos), protector.generate_formspec(meta)
+			"fc_protector_"..minetest.pos_to_string(pos), fc_protector.generate_formspec(meta)
 			)
 		end
 	end,
 
 	on_punch = function(pos, node, puncher)
-		if not protector.can_dig(1,pos,puncher:get_player_name(),true,1) then
+		if not fc_protector.can_dig(1,pos,puncher:get_player_name(),true,1) then
 			return
 		end
 
-		minetest.env:add_entity(pos, "protector:display")
+		minetest.env:add_entity(pos, "fc_protector:display")
 		minetest.env:get_node_timer(pos):start(10)
 	end,
 
 	on_timer = function(pos)
 		local objs = minetest.env:get_objects_inside_radius(pos,.5)
 		for _, o in pairs(objs) do
-			if (not o:is_player()) and o:get_luaentity().name == "protector:display" then
+			if (not o:is_player()) and o:get_luaentity().name == "fc_protector:display" then
 				o:remove()
 			end
 		end
@@ -307,7 +307,7 @@ minetest.register_node("protector:protect2", {
 })
 
 minetest.register_craft({
-	output = "protector:protect2 4",
+	output = "fc_protector:protect2 4",
 	recipe = {
 		{"default:stone","default:stone","default:stone"},
 		{"default:stone","default:copper_ingot","default:stone"},
@@ -315,48 +315,48 @@ minetest.register_craft({
 	}
 })
 
--- If name entered into protector formspec
+-- If name entered into fc_protector formspec
 
 minetest.register_on_player_receive_fields(function(player,formname,fields)
-	if string.sub(formname,0,string.len("protector_")) == "protector_" then
-		local pos_s = string.sub(formname,string.len("protector_")+1)
+	if string.sub(formname,0,string.len("fc_protector_")) == "fc_protector_" then
+		local pos_s = string.sub(formname,string.len("fc_protector_")+1)
 		local pos = minetest.string_to_pos(pos_s)
 		local meta = minetest.env:get_meta(pos)
 
 		if meta:get_int("page") == nil then meta:set_int("page",0) end
 
-		if not protector.can_dig(1,pos,player:get_player_name(),true,1) then
+		if not fc_protector.can_dig(1,pos,player:get_player_name(),true,1) then
 			return
 		end
 
-		if fields.protector_add_member then
-			for _, i in ipairs(fields.protector_add_member:split(" ")) do
-				protector.add_member(meta,i)
+		if fields.fc_protector_add_member then
+			for _, i in ipairs(fields.fc_protector_add_member:split(" ")) do
+				fc_protector.add_member(meta,i)
 			end
 		end
 
 		for field, value in pairs(fields) do
-			if string.sub(field,0,string.len("protector_del_member_"))=="protector_del_member_" then
-				protector.del_member(meta, string.sub(field,string.len("protector_del_member_")+1))
+			if string.sub(field,0,string.len("fc_protector_del_member_"))=="fc_protector_del_member_" then
+				fc_protector.del_member(meta, string.sub(field,string.len("fc_protector_del_member_")+1))
 			end
 		end
 
 		if fields.close_me then
 			meta:set_int("page",meta:get_int("page"))
-			else minetest.show_formspec(player:get_player_name(), formname,	protector.generate_formspec(meta))
+			else minetest.show_formspec(player:get_player_name(), formname,	fc_protector.generate_formspec(meta))
 		end
 	end
 end)
 
-minetest.register_entity("protector:display", {
+minetest.register_entity("fc_protector:display", {
 	physical = false,
 	collisionbox = {0,0,0,0,0,0},
 	visual = "wielditem",
 	visual_size = {x=1.0/1.5,y=1.0/1.5}, -- wielditem seems to be scaled to 1.5 times original node size
-	textures = {"protector:display_node"},
+	textures = {"fc_protector:display_node"},
 	on_step = function(self, dtime)
 		local nam = minetest.get_node(self.object:getpos()).name
-		if nam ~= "protector:protect" and nam ~= "protector:protect2" then
+		if nam ~= "fc_protector:protect" and nam ~= "fc_protector:protect2" then
 			self.object:remove()
 			return
 		end
@@ -364,9 +364,9 @@ minetest.register_entity("protector:display", {
 })
 
 -- Display-zone node, Do NOT place the display as a node, it is made to be used as an entity (see above)
-local x = protector.radius
-minetest.register_node("protector:display_node", {
-	tiles = {"protector_display.png"},
+local x = fc_protector.radius
+minetest.register_node("fc_protector:display_node", {
+	tiles = {"fc_protector_display.png"},
 	use_texture_alpha = true,
 	walkable = false,
 	drawtype = "nodebox",
@@ -382,7 +382,7 @@ minetest.register_node("protector:display_node", {
 			{-(x+.55), (x+.45), -(x+.55), (x+.55), (x+.55), (x+.55)},
 			-- bottom
 			{-(x+.55), -(x+.55), -(x+.55), (x+.55), -(x+.45), (x+.55)},
-			-- middle (surround protector)
+			-- middle (surround fc_protector)
 			{-.55,-.55,-.55, .55,.55,.55},
 		},
 	},
@@ -425,13 +425,13 @@ end
 
 -- Protected Wooden Door
 
-local name = "protector:door_wood"
+local name = "fc_protector:door_wood"
 
 doors.register_door(name, {
 	description = "Protected Wooden Door",
-	inventory_image = "door_wood.png^protector_logo.png",
+	inventory_image = "door_wood.png^fc_protector_logo.png",
 	groups = {snappy=1,choppy=2,oddly_breakable_by_hand=2,flammable=2,door=1},
-	tiles_bottom = {"door_wood_b.png^protector_logo.png", "door_brown.png"},
+	tiles_bottom = {"door_wood_b.png^fc_protector_logo.png", "door_brown.png"},
 	tiles_top = {"door_wood_a.png", "door_brown.png"},
 	sounds = default.node_sound_wood_defaults(),
 	sunlight = false,
@@ -487,13 +487,13 @@ minetest.register_craft({
 
 -- Protected Steel Door
 
-local name = "protector:door_steel"
+local name = "fc_protector:door_steel"
 
 doors.register_door(name, {
 	description = "Protected Steel Door",
-	inventory_image = "door_steel.png^protector_logo.png",
+	inventory_image = "door_steel.png^fc_protector_logo.png",
 	groups = {snappy=1,bendy=2,cracky=1,melty=2,level=2,door=1},
-	tiles_bottom = {"door_steel_b.png^protector_logo.png", "door_grey.png"},
+	tiles_bottom = {"door_steel_b.png^fc_protector_logo.png", "door_grey.png"},
 	tiles_top = {"door_steel_a.png", "door_grey.png"},
 	sounds = default.node_sound_wood_defaults(),
 	sunlight = false,
@@ -562,10 +562,10 @@ local function get_locked_chest_formspec(pos)
 end
 
 -- Protected Chest
-minetest.register_node("protector:chest", {
+minetest.register_node("fc_protector:chest", {
 	description = "Protected Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
-		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png^protector_logo.png"},
+		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png^fc_protector_logo.png"},
 	paramtype2 = "facedir",
 	groups = {choppy=2,oddly_breakable_by_hand=2},
 	legacy_facedir_simple = true,
@@ -616,7 +616,7 @@ minetest.register_node("protector:chest", {
 })
 
 minetest.register_craft({
-	output = 'protector:chest',
+	output = 'fc_protector:chest',
 	recipe = {
 		{'group:wood', 'group:wood', 'group:wood'},
 		{'group:wood', 'default:copper_ingot', 'group:wood'},
