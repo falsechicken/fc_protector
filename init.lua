@@ -518,32 +518,32 @@ doors.register_door(name, {
 })
 
 minetest.override_item(name.."_b_1", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if checkLock(pos, node, clicker, keyItem) then
 			on_rightclick(pos, 1, name.."_t_1", name.."_b_2", name.."_t_2", {1,2,3,0})
 		end
 	end,
 })
 
 minetest.override_item(name.."_t_1", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if checkLock(pos, node, clicker, keyItem) then
 			on_rightclick(pos, -1, name.."_b_1", name.."_t_2", name.."_b_2", {1,2,3,0})
 		end
 	end,
 })
 
 minetest.override_item(name.."_b_2", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if checkLock(pos, node, clicker, keyItem) then
 			on_rightclick(pos, 1, name.."_t_2", name.."_b_1", name.."_t_1", {3,0,1,2})
 		end
 	end,
 })
 
 minetest.override_item(name.."_t_2", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if checkLock(pos, node, clicker, keyItem) then
 			on_rightclick(pos, -1, name.."_b_2", name.."_t_1", name.."_b_1", {3,0,1,2})
 		end
 	end,
