@@ -348,22 +348,17 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 	end
 	
 	if formname == "locklabel" then -- If the locklabel is used.
-			
 		if fields["nameField"] ~= nil then -- User did not press esc/cancel
-			
 			local heldKey = player:get_wielded_item() -- Get the key in hand.
-			
+			local keyName = fields["nameField"]
 			local keyCode = generateKeyCode() -- Secret code for the key.
-			
-			heldKey:set_metadata(fields["nameField"].."|"..keyCode) -- Set key metadata. Key name and password seperated by a pipe (|)
-			
+			heldKey:set_metadata(keyName .."|"..keyCode) -- Set key metadata. Key name and password seperated by a pipe (|)
 			player:set_wielded_item(heldKey)
-			
+			minetest.chat_send_player(player:get_player_name(), "Key has been initialized with name: " .. keyName)			
 		else
 			return
 		end		
 	end
-	
 end)
 
 minetest.register_entity("fc_protector:display", {
@@ -621,9 +616,9 @@ minetest.register_node("fc_protector:chest", {
 		minetest.log("action", player:get_player_name()..
 				" takes stuff from protected chest at "..minetest.pos_to_string(pos))
 	end,
-	on_rightclick = function(pos, node, clicker)
+	on_rightclick = function(pos, node, clicker, keyItem)
 		local meta = minetest.get_meta(pos)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+		if checkLock(pos, node, clicker, keyItem) then
 			minetest.show_formspec(
 				clicker:get_player_name(),
 				"default:chest_locked",
@@ -698,7 +693,7 @@ function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is
 				minetest.chat_send_player(clicker:get_player_name(), "Key has not been initialized! Left click with key to do so now.")
 			end
 		else
-			minetest.chat_send_player(clicker:get_player_name(), "Door has no key. Right click with key to set.") -- Inform the player that the door is unlocked.
+			minetest.chat_send_player(clicker:get_player_name(), "Lock has no key. Right click with key to set.") -- Inform the player that the door is unlocked.
 			return true
 		end
 	else -- Door has key setup
@@ -710,7 +705,7 @@ function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is
 				return false
 			end
 		else -- If not tell the player the door is locked.
-			minetest.chat_send_player(clicker:get_player_name(), "Door Is Locked.")
+			minetest.chat_send_player(clicker:get_player_name(), "Item Is Locked.")
 			return false
 	    end
 	end
