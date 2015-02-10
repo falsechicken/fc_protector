@@ -353,7 +353,7 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 			
 			local heldKey = player:get_wielded_item() -- Get the key in hand.
 			
-			local keyCode = generateKeyData() -- Secret code for the key.
+			local keyCode = generateKeyCode() -- Secret code for the key.
 			
 			heldKey:set_metadata(fields["nameField"].."|"..keyCode) -- Set key metadata. Key name and password seperated by a pipe (|)
 			
@@ -682,7 +682,7 @@ function setKey(keyStack, nodeToLock) -- Called when a door/chest has no key ass
 	minetest.get_meta(nodeToLock):set_string("infotext", "Key: " .. getKeyName(keyStack))
 end
 
-function generateKeyData() -- Generates a random passcode for key metadata. Called when new keys are used for the first time.
+function generateKeyCode() -- Generates a random passcode for key metadata. Called when new keys are used for the first time.
 	local keyCode = math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. 
 							math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9)	
 	return keyCode
