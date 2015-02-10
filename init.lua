@@ -718,6 +718,6 @@ function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is
 end
 
 function showKeyLabelFormspec(player) -- Show the Key Label formspec. Allows the player to give the key a nickname to help in finding the proper key to a lock.
-	local llFormspec = "size[3,2]" .. "field[0,1;3,1;nameField;Key Name;]"
+	local llFormspec = "size[2.4,0.6]" .. "field[0,0.3;3,1;nameField;Key Name;]"
 	minetest.show_formspec(player:get_player_name(), "locklabel", llFormspec)
 end
