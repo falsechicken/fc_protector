@@ -346,6 +346,24 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 			else minetest.show_formspec(player:get_player_name(), formname,	fc_protector.generate_formspec(meta))
 		end
 	end
+	
+	if formname == "locklabel" then -- If the locklabel is used.
+			
+		if fields["nameField"] ~= nil then -- User did not press esc/cancel
+			
+			local heldKey = player:get_wielded_item() -- Get the key in hand.
+			
+			local keyCode = generateKeyData() -- Secret code for the key.
+			
+			heldKey:set_metadata(fields["nameField"].."|"..keyCode) -- Set key metadata. Key name and password seperated by a pipe (|)
+			
+			player:set_wielded_item(heldKey)
+			
+		else
+			return
+		end		
+	end
+	
 end)
 
 minetest.register_entity("fc_protector:display", {
@@ -630,11 +648,15 @@ minetest.register_craftitem("fc_protector:key", {
 	inventory_image = "normal_key.png",
 	stack_max = 1,
 	on_use = function(keyStack, player)
-				printKeyData(keyStack, player)
+				if keyStack:get_metadata() == "" then -- Key has not been initialized.
+					showKeyLabelFormspec(player) -- Show key label dialog.
+				else
+					minetest.chat_send_player(player:get_player_name(), "Key Name: " .. getKeyName(keyStack)) -- Print the name of the key to the player.
+				end
 			 end,
 	})
 	
-function printKeyData(keyStack, player) -- Temp workaround until description can be dynamically set.
+function printKeyData(keyStack, player) -- Print raw key metadata. Debug only.
 	
 	local keyMetadata = keyStack:get_metadata()
 	
@@ -645,11 +667,19 @@ function printKeyData(keyStack, player) -- Temp workaround until description can
 	end
 end
 
+function getKeyName(keyStack) -- Get the name of the key
+	local keyName = string.split(keyStack:get_metadata(), "|")
+	return keyName[1]
+end
+
+function getKeyCode(keyStack) -- Get the code of the key. (Secret code (metadata "key") used to actually lock objects.)
+	local keyName = string.split(keyStack:get_metadata(), "|")
+	return keyName[2]	
+end
+
 function setKey(keyStack, nodeToLock) -- Called when a door/chest has no key assigned. 
-	if keyStack:get_metadata() == "" then -- Key is new and has not had a code generated yet.
-		keyStack:set_metadata(generateKeyData())
-	end
-	minetest.get_meta(nodeToLock):set_string("key", keyStack:get_metadata())
+	minetest.get_meta(nodeToLock):set_string("key", getKeyCode(keyStack))
+	minetest.get_meta(nodeToLock):set_string("infotext", "Key: " .. getKeyName(keyStack))
 end
 
 function generateKeyData() -- Generates a random passcode for key metadata. Called when new keys are used for the first time.
@@ -661,15 +691,19 @@ end
 function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is locked and if key is correct. 
 	if minetest.get_meta(pos):get_string("key") == "" then -- Door has no key setup
 		if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key and the door has no assigned key.
-			setKey(keyItem, pos) -- Lock the door with the current key.
-			minetest.chat_send_player(clicker:get_player_name(), "Key Set!") -- Inform the player that the lock has been set with key.
+			if getKeyName(keyItem) ~= nil then -- Key has been initialized. Ok to proceed with setting lock.
+				setKey(keyItem, pos) -- Lock the door with the current key.
+				minetest.chat_send_player(clicker:get_player_name(), "Key Set!") -- Inform the player that the lock has been set with key.
+			else -- If key has not been initialized.
+				minetest.chat_send_player(clicker:get_player_name(), "Key has not been initialized! Left click with key to do so now.")
+			end
 		else
 			minetest.chat_send_player(clicker:get_player_name(), "Door has no key. Right click with key to set.") -- Inform the player that the door is unlocked.
 			return true
 		end
 	else -- Door has key setup
 		if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key check it.
-			if keyItem:get_metadata() == minetest.get_meta(pos):get_string("key") then -- If key matches.
+			if getKeyCode(keyItem) == minetest.get_meta(pos):get_string("key") then -- If key matches.
 				return true
 			else
 				minetest.chat_send_player(clicker:get_player_name(), "Wrong Key.")
@@ -680,4 +714,12 @@ function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is
 			return false
 	    end
 	end
+end
+
+function showKeyLabelFormspec(player) -- Show the Key Label formspec. Allows the player to give the key a nickname to help in finding the proper key to a lock.
+	
+	local llFormspec = "size[3,2]" .. "field[0,1;3,1;nameField;Key Name;]"
+	
+	minetest.show_formspec(player:get_player_name(), "locklabel", llFormspec)
+	
 end
