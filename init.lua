@@ -650,9 +650,9 @@ minetest.register_craftitem("fc_protector:key", {
 	})
 	
 minetest.register_craftitem("fc_protector:blankkey", {
-description = "Blank Key",
-inventory_image = "blank_key.png",
-stack_max = 16,
+	description = "Blank Key",
+	inventory_image = "blank_key.png",
+	stack_max = 1,
 on_use = function(keyStack, player)
 			showKeyLabelFormspec(player) -- Show key label dialog.
 		 end,
