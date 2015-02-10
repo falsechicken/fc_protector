@@ -439,25 +439,8 @@ doors.register_door(name, {
 
 minetest.override_item(name.."_b_1", {
 	on_rightclick = function(pos, node, clicker, keyItem)
-		if minetest.get_meta(pos):get_string("key") == "" then -- Door has no key setup
-			print("Door has no key") -- DEBUG
-			if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key and the door has no assigned key.
-				print("Attempting to lock door...") -- DEBUG
-				setKey(keyItem, pos) -- Lock the door with the current key.
-			else
-				on_rightclick(pos, 1, name.."_t_1", name.."_b_2", name.."_t_2", {1,2,3,0}) -- Open otherwise.
-			end
-		else -- Door has key setup
-			if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key check it.
-			
-				if keyItem:get_metadata() == minetest.get_meta(pos):get_string("key") then -- If key matches.
-					on_rightclick(pos, 1, name.."_t_1", name.."_b_2", name.."_t_2", {1,2,3,0})
-				else
-					minetest.chat_send_player(clicker:get_player_name(), "Wrong Key.")
-				end
-			else -- If not tell the player the door is locked.
-				minetest.chat_send_player(clicker:get_player_name(), "Door Is Locked.")
-			end
+		if checkLock(pos, node, clicker, keyItem) then
+			on_rightclick(pos, 1, name.."_t_1", name.."_b_2", name.."_t_2", {1,2,3,0})
 		end
 	end,
 })
@@ -676,7 +659,30 @@ end
 
 function generateKeyData() -- Generates a random passcode for key metadata. Called when new keys are used for the first time.
 	local keyCode = math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. 
-							math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9)
-	
+							math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9)	
 	return keyCode
+end
+
+function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is locked and if key is correct. 
+	if minetest.get_meta(pos):get_string("key") == "" then -- Door has no key setup
+		print("Door has no key") -- DEBUG
+		if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key and the door has no assigned key.
+			print("Attempting to lock door...") -- DEBUG
+			setKey(keyItem, pos) -- Lock the door with the current key.
+		else
+			return true
+		end
+	else -- Door has key setup
+		if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key check it.
+			if keyItem:get_metadata() == minetest.get_meta(pos):get_string("key") then -- If key matches.
+				return true
+			else
+				minetest.chat_send_player(clicker:get_player_name(), "Wrong Key.")
+				return false
+			end
+		else -- If not tell the player the door is locked.
+			minetest.chat_send_player(clicker:get_player_name(), "Door Is Locked.")
+			return false
+	    end
+	end
 end
