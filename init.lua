@@ -351,7 +351,9 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 		if fields["nameField"] ~= nil then -- User did not press esc/cancel
 			local heldKey = player:get_wielded_item() -- Get the key in hand.
 			local keyName = fields["nameField"]
-			local keyCode = generateKeyCode() -- Secret code for the key.
+			local keyCode = generateKeyCode() -- Secret code for the key.			
+			local newKey = {name="fc_protector:key", count=1, wear=0, metadata=""} -- Define the ItemStack for the new normal key to replace blank key.
+			heldKey:replace(newKey) -- Remove blank key and replace with normal key.
 			heldKey:set_metadata(keyName .."|"..keyCode) -- Set key metadata. Key name and password seperated by a pipe (|)
 			player:set_wielded_item(heldKey)
 			minetest.chat_send_player(player:get_player_name(), "Key has been initialized with name: " .. keyName)			
@@ -637,19 +639,27 @@ minetest.register_craft({
 	}
 })
 
--- Register door/chest key.
+-- Register door/chest keys.
 minetest.register_craftitem("fc_protector:key", {
 	description = "Normal Key",
 	inventory_image = "normal_key.png",
 	stack_max = 1,
 	on_use = function(keyStack, player)
-				if keyStack:get_metadata() == "" then -- Key has not been initialized.
-					showKeyLabelFormspec(player) -- Show key label dialog.
-				else
 					minetest.chat_send_player(player:get_player_name(), "Key Name: " .. getKeyName(keyStack)) -- Print the name of the key to the player.
-				end
 			 end,
 	})
+	
+minetest.register_craftitem("fc_protector:blankkey", {
+description = "Blank Key",
+inventory_image = "blank_key.png",
+stack_max = 16,
+on_use = function(keyStack, player)
+			showKeyLabelFormspec(player) -- Show key label dialog.
+		 end,
+on_place = function(keyStack, player)
+			minetest.chat_send_player(player:get_player_name(), "Key has not been initialized! Left click with key to do so now.")
+		 end,
+})
 	
 function printKeyData(keyStack, player) -- Print raw key metadata. Debug only.
 	
