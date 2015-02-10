@@ -446,24 +446,24 @@ minetest.override_item(name.."_b_1", {
 })
 
 minetest.override_item(name.."_t_1", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if checkLock(pos, node, clicker, keyItem) then
 			on_rightclick(pos, -1, name.."_b_1", name.."_t_2", name.."_b_2", {1,2,3,0})
 		end
 	end,
 })
 
 minetest.override_item(name.."_b_2", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if checkLock(pos, node, clicker, keyItem) then
 			on_rightclick(pos, 1, name.."_t_2", name.."_b_1", name.."_t_1", {3,0,1,2})
 		end
 	end,
 })
 
 minetest.override_item(name.."_t_2", {
-	on_rightclick = function(pos, node, clicker)
-		if not minetest.is_protected(pos, clicker:get_player_name()) then
+	on_rightclick = function(pos, node, clicker, keyItem)
+		if checkLock(pos, node, clicker, keyItem) then
 			on_rightclick(pos, -1, name.."_b_2", name.."_t_1", name.."_b_1", {3,0,1,2})
 		end
 	end,
@@ -626,8 +626,8 @@ minetest.register_craft({
 
 -- Register door/chest key.
 minetest.register_craftitem("fc_protector:key", {
-	description = "Blank Key",
-	inventory_image = "key.png",
+	description = "Normal Key",
+	inventory_image = "normal_key.png",
 	stack_max = 1,
 	on_use = function(keyStack, player)
 				printKeyData(keyStack, player)
@@ -646,15 +646,10 @@ function printKeyData(keyStack, player) -- Temp workaround until description can
 end
 
 function setKey(keyStack, nodeToLock) -- Called when a door/chest has no key assigned. 
-
 	if keyStack:get_metadata() == "" then -- Key is new and has not had a code generated yet.
 		keyStack:set_metadata(generateKeyData())
 	end
-
 	minetest.get_meta(nodeToLock):set_string("key", keyStack:get_metadata())
-	
-	print("Key Set!") -- DEBUG
-
 end
 
 function generateKeyData() -- Generates a random passcode for key metadata. Called when new keys are used for the first time.
@@ -665,11 +660,11 @@ end
 
 function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is locked and if key is correct. 
 	if minetest.get_meta(pos):get_string("key") == "" then -- Door has no key setup
-		print("Door has no key") -- DEBUG
 		if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key and the door has no assigned key.
-			print("Attempting to lock door...") -- DEBUG
 			setKey(keyItem, pos) -- Lock the door with the current key.
+			minetest.chat_send_player(clicker:get_player_name(), "Key Set!") -- Inform the player that the lock has been set with key.
 		else
+			minetest.chat_send_player(clicker:get_player_name(), "Door has no key. Right click with key to set.") -- Inform the player that the door is unlocked.
 			return true
 		end
 	else -- Door has key setup
