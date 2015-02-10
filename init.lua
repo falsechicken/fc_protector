@@ -696,12 +696,8 @@ end
 function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is locked and if key is correct. 
 	if minetest.get_meta(pos):get_string("key") == "" then -- Door has no key setup
 		if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key and the door has no assigned key.
-			if getKeyName(keyItem) ~= nil then -- Key has been initialized. Ok to proceed with setting lock.
-				setKey(keyItem, pos) -- Lock the door with the current key.
-				minetest.chat_send_player(clicker:get_player_name(), "Key Set!") -- Inform the player that the lock has been set with key.
-			else -- If key has not been initialized.
-				minetest.chat_send_player(clicker:get_player_name(), "Key has not been initialized! Left click with key to do so now.")
-			end
+			setKey(keyItem, pos) -- Lock the door with the current key.
+			minetest.chat_send_player(clicker:get_player_name(), "Key Set!") -- Inform the player that the lock has been set with key.
 		else
 			minetest.chat_send_player(clicker:get_player_name(), "Lock has no key. Right click with key to set.") -- Inform the player that the door is unlocked.
 			return true
