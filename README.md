@@ -13,9 +13,9 @@ Released under WTFPL
 
 NEW FEATURES: 
 
-	- Keys -
+- Keys
 
-		-All protection doors and the chest now require keys to be protected from players opening them.
+	- All protection doors and the chest now require keys to be protected from players opening them.
 
 
 - Crafting And Using Keys
@@ -35,16 +35,13 @@ chat area.
 
 Please take note of the currently known bugs below.
 
-KNOWN BUGS:
-
-
+- KNOWN BUGS:
+	
 	1. The keys set the lock by node. Meaning that since doors are two nodes tall you must set the key for BOTH THE TOP AND BOTTOM. I am working on a fix.
 
 
-TODO/WISHLIST:
-
+- TODO/WISHLIST:
 
 	1. Way to copy keys. I am thinking a new machine like node to do this.
-
-	2. Integrate the protection blocks into some sort of economy system and make the size configurable from the formspec.
+	- Integrate the protection blocks into some sort of economy system and make the size configurable from the formspec.
 		The cost should be scaled based on how many blocks total you protect. Think rent.
