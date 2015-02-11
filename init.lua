@@ -1,7 +1,7 @@
 minetest.register_privilege("delprotect","Ignore other players protection")
 
 fc_protector = {}
-fc_protector.radius = 5
+fc_protector.radius = 7
 
 fc_protector.get_member_list = function(meta)
 	local s = meta:get_string("members")
@@ -660,6 +660,12 @@ on_place = function(keyStack, player)
 			minetest.chat_send_player(player:get_player_name(), "Key has not been initialized! Left click with key to do so now.")
 		 end,
 })
+
+minetest.register_craft({ -- Blank key recipe.
+	type = "shapeless",
+	output = "fc_protector:blankkey",
+	recipe = {"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
+})
 	
 function printKeyData(keyStack, player) -- Print raw key metadata. Debug only.
 	
@@ -707,11 +713,11 @@ function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is
 			if getKeyCode(keyItem) == minetest.get_meta(pos):get_string("key") then -- If key matches.
 				return true
 			else
-				minetest.chat_send_player(clicker:get_player_name(), "Wrong Key.")
+				minetest.chat_send_player(clicker:get_player_name(), "Wrong Key!")
 				return false
 			end
 		else -- If not tell the player the door is locked.
-			minetest.chat_send_player(clicker:get_player_name(), "Item Is Locked.")
+			minetest.chat_send_player(clicker:get_player_name(), "Object Is Locked.")
 			return false
 	    end
 	end
