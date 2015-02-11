@@ -21,7 +21,7 @@ NEW FEATURES:
 - Crafting And Using Keys
 
 
-To craft a key place three steel ingots in a horizontal line. This will give you a blank key.
+To craft a key place three steel ingots in the crafting area. Current recipe is shapeless. This will give you a blank key.
 
 To use a blank key it must be initialized. To do so left click (punch) with it. A prompt will
 appear asking you to name the key (Press enter to confirm or esc to cancel.). This will name the key
