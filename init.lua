@@ -693,7 +693,7 @@ function setKey(keyStack, nodeToLock) -- Called when a door/chest has no key ass
 	minetest.get_meta(nodeToLock):set_string("infotext", "Key: " .. getKeyName(keyStack))
 end
 
-function generateKeyCode() -- Generates a random passcode for key metadata. Called when new keys are used for the first time.
+function generateKeyCode() -- Generates a random passcode for key metadata. Called when blank keys are used for the first time.
 	local keyCode = math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. 
 							math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9) .. math.random(0, 9)	
 	return keyCode
