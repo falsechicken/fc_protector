@@ -716,7 +716,7 @@ function setKey(keyStack, nodeToLockPos) -- Called when a door/chest has no key 
 		minetest.get_meta(nodeToLockPos):set_string("key", getKeyCode(keyStack))
 		minetest.get_meta(nodeToLockPos):set_string("infotext", "Key: " .. getKeyName(keyStack))
 	
-	elseif (nodeName == doorPrefixSteel.."_t_1" or nodeName == doorPrefixSteel.."_t_2") then -- If we are setting the bottom of the steel door.
+	elseif (nodeName == doorPrefixSteel.."_t_1" or nodeName == doorPrefixSteel.."_t_2") then -- If we are setting the top of the steel door.
 		
 		nodeToLockPos.y = nodeToLockPos.y - 1 -- Move down one since we are at the top door node.	
 		minetest.get_meta(nodeToLockPos):set_string("key", getKeyCode(keyStack))
