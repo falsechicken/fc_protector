@@ -688,9 +688,42 @@ function getKeyCode(keyStack) -- Get the code of the key. (Secret code (metadata
 	return keyName[2]	
 end
 
-function setKey(keyStack, nodeToLock) -- Called when a door/chest has no key assigned. 
-	minetest.get_meta(nodeToLock):set_string("key", getKeyCode(keyStack))
-	minetest.get_meta(nodeToLock):set_string("infotext", "Key: " .. getKeyName(keyStack))
+function setKey(keyStack, nodeToLockPos) -- Called when a door/chest has no key assigned. 
+	
+	local doorPrefixWood = "fc_protector:door_wood" -- Used when checking for the second node of a door. Fixes the need to set both door nodes with key manually.
+	local doorPrefixSteel = "fc_protector:door_steel"
+	
+	local nodeName = minetest.get_node(nodeToLockPos).name
+	
+	minetest.get_meta(nodeToLockPos):set_string("key", getKeyCode(keyStack))
+	minetest.get_meta(nodeToLockPos):set_string("infotext", "Key: " .. getKeyName(keyStack))
+	
+	if (nodeName == doorPrefixWood.."_b_1" or nodeName == doorPrefixWood.."_b_2") then -- If we are setting the bottom of the wooden door also set the node above with the same key.
+		
+	    nodeToLockPos.y = nodeToLockPos.y + 1 -- Move up one since we are at the bottom door node.		
+		minetest.get_meta(nodeToLockPos):set_string("key", getKeyCode(keyStack))
+		minetest.get_meta(nodeToLockPos):set_string("infotext", "Key: " .. getKeyName(keyStack))
+		
+	elseif (nodeName == doorPrefixWood.."_t_1" or nodeName == doorPrefixWood.."_t_2") then -- If we are setting the top of the wooden door also set the node below with the same key.
+		
+		nodeToLockPos.y = nodeToLockPos.y - 1 -- Move down one since we are at the top door node.	
+		minetest.get_meta(nodeToLockPos):set_string("key", getKeyCode(keyStack))
+		minetest.get_meta(nodeToLockPos):set_string("infotext", "Key: " .. getKeyName(keyStack))
+	
+	elseif (nodeName == doorPrefixSteel.."_b_1" or nodeName == doorPrefixSteel.."_b_2") then -- If we are setting the bottom of the steel door.
+		
+		nodeToLockPos.y = nodeToLockPos.y + 1 -- Move up one since we are at the bottom door node.	
+		minetest.get_meta(nodeToLockPos):set_string("key", getKeyCode(keyStack))
+		minetest.get_meta(nodeToLockPos):set_string("infotext", "Key: " .. getKeyName(keyStack))
+	
+	elseif (nodeName == doorPrefixSteel.."_t_1" or nodeName == doorPrefixSteel.."_t_2") then -- If we are setting the bottom of the steel door.
+		
+		nodeToLockPos.y = nodeToLockPos.y - 1 -- Move down one since we are at the top door node.	
+		minetest.get_meta(nodeToLockPos):set_string("key", getKeyCode(keyStack))
+		minetest.get_meta(nodeToLockPos):set_string("infotext", "Key: " .. getKeyName(keyStack))
+	
+	end
+	
 end
 
 function generateKeyCode() -- Generates a random passcode for key metadata. Called when blank keys are used for the first time.
