@@ -37,7 +37,7 @@ Please take note of the currently known bugs below.
 
 - KNOWN BUGS:
 	
-	1. The keys set the lock by node. Meaning that since doors are two nodes tall you must set the key for BOTH THE TOP AND BOTTOM. I am working on a fix.
+	None at the moment.
 
 
 - TODO/WISHLIST:
