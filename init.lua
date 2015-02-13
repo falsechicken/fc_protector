@@ -133,15 +133,15 @@ fc_protector.can_dig = function(r,pos,digger,onlyowner,infolevel)
 
 	if infolevel == 2 then
 		if #positions < 1 then
-			minetest.chat_send_player(whois,"This area is not protected.")
+			sendMessageToPlayerName(whois,"This area is not protected.")
 		else
 			local meta = minetest.env:get_meta(positions[1])
-			minetest.chat_send_player(whois,"This area is owned by "..meta:get_string("owner")..".")
+			sendMessageToPlayerName(whois,"This area is owned by "..meta:get_string("owner")..".")
 			if meta:get_string("members") ~= "" then
-				minetest.chat_send_player(whois,"Members: "..meta:get_string("members")..".")
+				sendMessageToPlayerName(whois,"Members: "..meta:get_string("members")..".")
 			end
 		end
-		minetest.chat_send_player(whois,"You can build here.")
+		sendMessageToPlayerName(whois,"You can build here.")
 	end
 	return true
 end
@@ -167,7 +167,7 @@ function minetest.item_place(itemstack, placer, pointed_thing)
 		local pos = pointed_thing.above
 		local user = placer:get_player_name()
 		if not fc_protector.can_dig(fc_protector.radius * 2, pos, user, true, 3) then
-			minetest.chat_send_player(placer:get_player_name(),"Overlaps into another protected area")
+			sendMessageToPlayerName(placer:get_player_name(),"Overlaps into another protected area")
 			return fc_protector.old_node_place(itemstack, placer, pos)
 		end
 	end
@@ -363,7 +363,7 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 			heldKey:replace(newKey) -- Remove blank key and replace with normal key.
 			heldKey:set_metadata(keyName .."|"..keyCode) -- Set key metadata. Key name and password seperated by a pipe (|)
 			player:set_wielded_item(heldKey)
-			minetest.chat_send_player(player:get_player_name(), "Key has been initialized with name: " .. keyName)			
+			sendMessageToPlayerName(player:get_player_name(), "Key has been initialized with name: " .. keyName)			
 		else
 			return
 		end		
@@ -652,7 +652,7 @@ minetest.register_craftitem("fc_protector:key", {
 	inventory_image = "normal_key.png",
 	stack_max = 1,
 	on_use = function(keyStack, player)
-					minetest.chat_send_player(player:get_player_name(), "Key Name: " .. getKeyName(keyStack)) -- Print the name of the key to the player.
+					sendMessageToPlayerName(player:get_player_name(), "Key Name: " .. getKeyName(keyStack)) -- Print the name of the key to the player.
 			 end,
 	})
 	
