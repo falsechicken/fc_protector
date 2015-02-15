@@ -2,7 +2,9 @@
 
 local modName = "fc_protector"
 
-dofile(minetest.get_modpath("fc_protector").."/logman.lua")
+local LIBS_FOLDER_NAME = "/libs/"
+
+dofile(minetest.get_modpath("fc_protector")..LIBS_FOLDER_NAME.."logman.lua") -- Include LogMan.
 
 minetest.register_privilege("delprotect","Ignore player protection")
 
