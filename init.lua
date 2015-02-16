@@ -9,7 +9,7 @@ dofile(minetest.get_modpath("fc_protector")..LIBS_FOLDER_NAME.."logman.lua") -- 
 minetest.register_privilege("delprotect","Ignore player protection")
 
 fc_protector = {}
-fc_protector.radius = 7
+fc_protector.radius = 8
 
 fc_protector.get_member_list = function(meta)
 	local s = meta:get_string("members")
