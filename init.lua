@@ -55,7 +55,7 @@ fc_protector.generate_formspec = function(meta)
 	if meta:get_int("page") == nil then meta:set_int("page",0) end
 
 	local formspec = "size[8,7]"..default.gui_bg..default.gui_bg_img..default.gui_slots -- Added new formspec defaults
-		.."label[2.5,0;-- FC Protector interface --]"
+		.."label[2.5,0;-- FC fc_protector interface --]"
 		.."label[0,1;Punch node to show protected area]"
 		.."label[0,2;Members: (type nick, press Enter to add)]"
 	local members = fc_protector.get_member_list(meta)
@@ -208,7 +208,7 @@ minetest.register_node("fc_protector:protect", {
 			return
 		end
 
-		protector.can_dig(protector.radius,pointed_thing.under,user:get_player_name(),false,2)
+		fc_protector.can_dig(fc_protector.radius,pointed_thing.under,user:get_player_name(),false,2)
 	end,
 
 	on_rightclick = function(pos, node, clicker, itemstack)
@@ -284,7 +284,7 @@ minetest.register_node("fc_protector:protect2", {
 			return
 		end
 		
-		protector.can_dig(protector.radius,pointed_thing.under,user:get_player_name(),false,2)
+		fc_protector.can_dig(fc_protector.radius,pointed_thing.under,user:get_player_name(),false,2)
 	end,
 
 	on_rightclick = function(pos, node, clicker, itemstack)
