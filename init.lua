@@ -121,11 +121,11 @@ fc_protector.can_dig = function(r,pos,digger,onlyowner,infolevel)
 		if owner ~= whois then 
 			if onlyowner or not fc_protector.is_member(meta, whois) then
 				if infolevel == 1 then
-					sendMessageToPlayer(whois, "This area is owned by "..owner.." !")
+					LogMan:sendMessageToPlayer(whois, "This area is owned by "..owner.." !")
 				elseif infolevel == 2 then
-					sendMessageToPlayer(whois,"This area is owned by "..meta:get_string("owner")..".")
+					LogMan:sendMessageToPlayer(whois,"This area is owned by "..meta:get_string("owner")..".")
 					if meta:get_string("members") ~= "" then
-						sendMessageToPlayer(whois,"Members: "..meta:get_string("members")..".")
+						LogMan:sendMessageToPlayer(whois,"Members: "..meta:get_string("members")..".")
 					end
 				end
 				return false
@@ -135,15 +135,15 @@ fc_protector.can_dig = function(r,pos,digger,onlyowner,infolevel)
 
 	if infolevel == 2 then
 		if #positions < 1 then
-			sendMessageToPlayerName(whois,"This area is not protected.")
+			LogMan:sendMessageToPlayerName(whois,"This area is not protected.")
 		else
 			local meta = minetest.env:get_meta(positions[1])
-			sendMessageToPlayerName(whois,"This area is owned by "..meta:get_string("owner")..".")
+			LogMan:sendMessageToPlayerName(whois,"This area is owned by "..meta:get_string("owner")..".")
 			if meta:get_string("members") ~= "" then
-				sendMessageToPlayerName(whois,"Members: "..meta:get_string("members")..".")
+				LogMan:sendMessageToPlayerName(whois,"Members: "..meta:get_string("members")..".")
 			end
 		end
-		sendMessageToPlayerName(whois,"You can build here.")
+		LogMan:sendMessageToPlayerName(whois,"You can build here.")
 	end
 	return true
 end
@@ -169,7 +169,7 @@ function minetest.item_place(itemstack, placer, pointed_thing)
 		local pos = pointed_thing.above
 		local user = placer:get_player_name()
 		if not fc_protector.can_dig(fc_protector.radius * 2, pos, user, true, 3) then
-			sendMessageToPlayerName(placer:get_player_name(),"Overlaps into another protected area")
+			LogMan:sendMessageToPlayerName(placer:get_player_name(),"Overlaps into another protected area")
 			return fc_protector.old_node_place(itemstack, placer, pos)
 		end
 	end
@@ -365,7 +365,7 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 			heldKey:replace(newKey) -- Remove blank key and replace with normal key.
 			heldKey:set_metadata(keyName .."|"..keyCode) -- Set key metadata. Key name and password seperated by a pipe (|)
 			player:set_wielded_item(heldKey)
-			sendMessageToPlayerName(player:get_player_name(), "Key has been initialized with name: " .. keyName)			
+			LogMan:sendMessageToPlayerName(player:get_player_name(), "Key has been initialized with name: " .. keyName)			
 		else
 			return
 		end		
@@ -654,7 +654,7 @@ minetest.register_craftitem("fc_protector:key", {
 	inventory_image = "normal_key.png",
 	stack_max = 1,
 	on_use = function(keyStack, player)
-					sendMessageToPlayerName(player:get_player_name(), "Key Name: " .. getKeyName(keyStack)) -- Print the name of the key to the player.
+					LogMan:sendMessageToPlayerName(player:get_player_name(), "Key Name: " .. getKeyName(keyStack)) -- Print the name of the key to the player.
 			 end,
 	})
 	
@@ -666,7 +666,7 @@ on_use = function(keyStack, player)
 			showKeyLabelFormspec(player) -- Show key label dialog.
 		 end,
 on_place = function(keyStack, player)
-			sendMessageToPlayer(player, "Key has not been initialized! Left click with key to do so now.")
+			LogMan:sendMessageToPlayer(player, "Key has not been initialized! Left click with key to do so now.")
 		 end,
 })
 
@@ -681,9 +681,9 @@ function printKeyData(keyStack, player) -- Print raw key metadata. Debug only.
 	local keyMetadata = keyStack:get_metadata()
 	
 	if keyMetadata == "" then
-		sendMessageToPlayer(player, "Key Data Empty.")
+		LogMan:sendMessageToPlayer(player, "Key Data Empty.")
 	else
-		sendMessageToPlayer(player, "Key Data: " .. keyMetadata)
+		LogMan:sendMessageToPlayer(player, "Key Data: " .. keyMetadata)
 	end
 end
 
@@ -745,9 +745,9 @@ function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is
 	if minetest.get_meta(pos):get_string("key") == "" then -- Door has no key setup
 		if keyItem:get_name() == "fc_protector:key" then -- If the player is holding a key and the door has no assigned key.
 			setKey(keyItem, pos) -- Lock the door with the current key.
-			sendMessageToPlayer(clicker, "Key Set!") -- Inform the player that the lock has been set with key.
+			LogMan:sendMessageToPlayer(clicker, "Key Set!") -- Inform the player that the lock has been set with key.
 		else
-			sendMessageToPlayer(clicker, "Lock has no key. Right click with key to set.") -- Inform the player that the door is unlocked.
+			LogMan:sendMessageToPlayer(clicker, "Lock has no key. Right click with key to set.") -- Inform the player that the door is unlocked.
 			return true
 		end
 	else -- Door has key setup
@@ -755,11 +755,11 @@ function checkLock(pos, node, clicker, keyItem) -- Check to see if door/chest is
 			if getKeyCode(keyItem) == minetest.get_meta(pos):get_string("key") then -- If key matches.
 				return true
 			else
-				sendMessageToPlayer(clicker, "Wrong Key!")
+				LogMan:sendMessageToPlayer(clicker, "Wrong Key!")
 				return false
 			end
 		else -- If not tell the player the door is locked.
-			sendMessageToPlayer(clicker, "Object Is Locked.")
+			LogMan:sendMessageToPlayer(clicker, "Object Is Locked.")
 			return false
 	    end
 	end

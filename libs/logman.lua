@@ -20,13 +20,16 @@
 ]]
 
 -- VARS --
+LogMan = {}
+
 local debugMode = false -- If true debug messages will be printed.
-local debugMessagesToPlayers = false -- It true debug messages will be send to the players as well.
+local debugMessagesToPlayers = false -- If true debug messages will be send to the players as well.
 
 local NAME = "LogMan" -- Name of the library. Used when printing messages about messages.
 -- END VARS --
 
 -- FUNCTIONS --
+
 
 --[[
 Logs a message to the console. 
@@ -43,7 +46,7 @@ Params:
 
 <message> : The message to be logged.
 ]]
-function logMessage (modName, level, message)
+function LogMan:logMessage (modName, level, message)
 	
 	local constructedMessage = ""
 	local time = os.date("%H:%M:%S") .. ": "
@@ -76,7 +79,7 @@ Params:
 
 <message> : The message to be logged.
 ]]
-function logRawMessage (message)
+function LogMan:logRawMessage (message)
 	print(message)
 end
 
@@ -87,7 +90,7 @@ Params:
 
 <message> : The message to send.
 ]]
-function broadcastMessage (message)
+function LogMan:broadcastMessage (message)
 	minetest.chat_send_all(message)
 end
 
@@ -100,7 +103,7 @@ Params:
 
 <message> : The message to send.
 ]]
-function sendMessageToPlayer (player, message)
+function LogMan:sendMessageToPlayer (player, message)
 	local playerName = player:get_player_name()
 	minetest.chat_send_player(playerName, message)
 end
@@ -114,7 +117,7 @@ Params:
 
 <message> : The message to send.
 ]]
-function sendMessageToPlayerName (playerName, message)
+function LogMan:sendMessageToPlayerName (playerName, message)
 	minetest.chat_send_player(playerName, message)
 end
 
@@ -127,7 +130,7 @@ Params:
 
 <message> : The message to send.
 ]]
-function sendMessageToPlayerList (playerList, message)
+function LogMan:sendMessageToPlayerList (playerList, message)
 	for i, player in ipairs(playerList) do
 		local playerName = player:get_player_name()
 		minetest.chat_send_player(playerName, message)
@@ -143,7 +146,7 @@ Params:
 
 <message> : The message to send.
 ]]
-function sendMessageToPlayerNameList (playerNamesList, message)
+function LogMan:sendMessageToPlayerNameList (playerNamesList, message)
 	for i, playerName in ipairs(playerNamesList) do
 		minetest.chat_send_player(playerName, message)
 	end
@@ -154,14 +157,14 @@ end
 --[[
 Enable debug mode.
 ]]
-function enableDebugMode()
+function LogMan:enableDebugMode()
 	debugMode = true
 end
 
 --[[
 Disable debug mode.
 ]]
-function disableDebugMode()
+function LogMan:disableDebugMode()
 	debugMode = false
 end
 
@@ -170,14 +173,14 @@ Enable the sending of debug messages to players.
 
 Will have no effect if debug mode is not enabled.
 ]]
-function enableDebugPlayerMessages()
+function LogMan:enableDebugPlayerMessages()
 	debugMessagesToPlayers = true
 end
 
 --[[
 Disable the sending of debug messages to players.
 ]]
-function disableDebugPlayerMessages()
+function LogMan:disableDebugPlayerMessages()
 	debugMessagesToPlayers = false
 end
 
